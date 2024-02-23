@@ -51,16 +51,20 @@ class CalorieTracker {
 
   _displayCaloriesRemaining() {
     const caloriesRemainingEl = document.getElementById('calories-remaining');
+    const parentContainer = caloriesRemainingEl.parentElement.parentElement;
     const caloriesRemaining = this._calorieLimit - this._totalCalories;
-    caloriesRemainingEl.textContent = this._calorieLimit - this._totalCalories;
 
-    if (caloriesRemaining <= 200) {
-      caloriesRemainingEl.classList.replace('bg-light', 'bg-danger');
-      caloriesRemainingEl.classList.add('text-white');
-    } else if (caloriesRemainingEl.classList.contains('bg-red')) {
-      caloriesRemainingEl.classList.replace('bg-danger', 'bg-light')
-      caloriesRemainingEl.classList.remove('text-white');
+    caloriesRemainingEl.textContent = caloriesRemaining;
+
+    if (caloriesRemaining <= 300) {
+      parentContainer.classList.replace('bg-light', 'bg-danger');
+      parentContainer.classList.add('text-white');
+    } else {
+      parentContainer.classList.replace('bg-danger', 'bg-light');
+      parentContainer.classList.remove('text-white');
     }
+
+
   }
 
   _render() {
@@ -94,10 +98,10 @@ const tracker = new CalorieTracker();
 const breakfast = new Meal('Breakfast', 1000);
 tracker.addMeal(breakfast);
 
-const lunch = new Meal('Lunch', 500);
+const lunch = new Meal('Lunch', 1699);
 tracker.addMeal(lunch);
 
-const basketball = new Workout('Basketball match', 700, 5);
-tracker.addWorkout(basketball);
+// const basketball = new Workout('Basketball match', 700, 5);
+// tracker.addWorkout(basketball);
 
 console.log(tracker);
