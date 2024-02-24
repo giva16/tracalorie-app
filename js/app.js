@@ -1,3 +1,5 @@
+// Where we keep track of calories, workouts, and meals
+// This class is directly connected to the UI
 class CalorieTracker {
   constructor() {
     this._calorieLimit = 3000;
@@ -112,16 +114,61 @@ class Workout {
   }
 }
 
-const tracker = new CalorieTracker();
+// Initializes CalorieTracker (including event listeners to connect CalorieTracker to the UI)
+// Manage the creation/deletion of meals, and workouts
+class App {
+  constructor() {
+    this._tracker = new CalorieTracker()
 
-const breakfast = new Meal('Breakfast', 1000);
-tracker.addMeal(breakfast);
+    const mealForm = document.getElementById('meal-form');
+    mealForm.addEventListener('submit', this._newMeal.bind(this));
+    
+    const workoutForm = document.getElementById('workout-form');
+    workout.addEventListener('submit', this._newWorkout.bind(this));
+    
+  }
 
-const lunch = new Meal('Lunch', 2799);
-tracker.addMeal(lunch);
+  _newMeal(e) {
+    e.preventDefault();
 
+    const name = document.getElementById('meal-name');
+    const calories = document.getElementById('meal-calories');
 
-const basketball = new Workout('Basketball match', 700, 5);
-tracker.addWorkout(basketball);
+    // Validate inputs
+    if (name.value === '' || calories .value=== '') {
+      alert('Please pill in all fields');
+      return;
+    }
 
-console.log(tracker);
+    // Create new meal, add it to tracker and add it to the DOM
+    const meal = new Meal(name.value, +calories.value);
+    this._tracker.addMeal(meal);
+
+    // clear forms
+    name.value = '';
+    calories.value = '';
+  }
+
+  _newWorkout(e) {
+    e.preventDefault();
+
+    const name = document.getElementById('meal-name');
+    const calories = document.getElementById('meal-calories');
+
+    // Validate inputs
+    if (name.value === '' || calories .value=== '') {
+      alert('Please pill in all fields');
+      return;
+    }
+
+    // Create new meal, add it to tracker and add it to the DOM
+    const meal = new Meal(name.value, +calories.value);
+    this._tracker.addMeal(meal);
+
+    // clear forms
+    name.value = '';
+    calories.value = '';
+  }
+}
+
+const app = new App();
