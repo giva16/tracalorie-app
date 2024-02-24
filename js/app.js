@@ -50,6 +50,13 @@ class CalorieTracker {
     }
   }
 
+  resetDay() {
+    this._meals = [];
+    this._workouts = [];
+    this._totalCalories = 0;
+    this._render();
+  }
+
   // Private Methods
   _displayNewMeal(meal) {
     const mealsEl = document.getElementById('meal-items');
@@ -205,6 +212,15 @@ class App {
 
     const workoutsEl = document.getElementById('workout-items');
     workoutsEl.addEventListener('click', this._removeItem.bind(this, 'workout'));
+
+    const filterMealInput = document.getElementById('filter-meals');
+    filterMealInput.addEventListener('input', this._filterItems.bind(this, 'meal'));
+
+    const filterWorkoutInput = document.getElementById('filter-workouts');
+    filterWorkoutInput.addEventListener('input', this._filterItems.bind(this, 'workout'));
+    
+    const resetBtn = document.getElementById('reset');
+    resetBtn.addEventListener('click', this._reset.bind(this));
   }
 
   _newItem(type, e) {
@@ -250,6 +266,39 @@ class App {
         
         e.target.closest('.card').remove();
       }
+    }
+  }
+
+  _filterItems(type, e) {
+    // f
+    const text = e.target.value;
+    const searchQuery = new RegExp(`^${text}`, 'i'); // Regex to filter elements
+    const items = document.querySelectorAll(`#${type}-items .card`);
+
+    items.forEach((item) => {
+      const name = item.firstElementChild.firstElementChild.firstElementChild.textContent;
+      
+      // hides item if it doesnt match search query
+      if (searchQuery.test(name)) {
+        item.style.display = 'block';
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  }
+
+  _reset() {
+    this._tracker.resetDay();
+    
+    // delete all meal items from DOM
+    const meals = document.getElementById('meal-items');
+    while (meals.firstElementChild) {
+      meals.firstElementChild.remove();
+    }
+    // delete alll workout items from DOM
+    const workouts = document.getElementById('workout-items');
+    while (workouts.firstElementChild) {
+      workouts.firstElementChild.remove();
     }
   }
 }
