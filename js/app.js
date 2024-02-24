@@ -28,6 +28,28 @@ class CalorieTracker {
     this._render();
   }
 
+  removeMeal(id) {
+    const index = this._meals.findIndex((meal) => meal.id === id);
+
+    if (index != -1) {
+      const meal = this._meals[index];
+      this._totalCalories -= meal.calories;
+      this._meals.splice(index, 1);
+      this._render();
+    }
+  }
+
+  removeWorkout(id) {
+    const index = this._workouts.findIndex((workout) => workout.id === id);
+    
+    if (index != -1) {
+      const workout = this._workouts[index];
+      this._totalCalories += workout.calories;
+      this._workouts.splice(index, 1);
+      this._render();
+    }
+  }
+
   // Private Methods
   _displayNewMeal(meal) {
     const mealsEl = document.getElementById('meal-items');
@@ -46,7 +68,7 @@ class CalorieTracker {
             ${meal.calories}
           </div>
           <button class="delete btn btn-danger btn-sm mx-2">
-            <i class="fa-solid fa-xmark"></i>
+            <i class="delete fa-solid fa-xmark"></i>
           </button>
         </div>
       </div>`;
@@ -71,7 +93,7 @@ class CalorieTracker {
             ${workout.calories}
           </div>
           <button class="delete btn btn-danger btn-sm mx-2">
-            <i class="fa-solid fa-xmark"></i>
+            <i class="delete fa-solid fa-xmark"></i>
           </button>
         </div>
       </div>`;
@@ -177,7 +199,12 @@ class App {
     
     const workoutForm = document.getElementById('workout-form');
     workoutForm.addEventListener('submit', this._newItem.bind(this, 'workout'));
-    
+
+    const mealsEl = document.getElementById('meal-items');
+    mealsEl.addEventListener('click', this._removeItem.bind(this, 'meal'));
+
+    const workoutsEl = document.getElementById('workout-items');
+    workoutsEl.addEventListener('click', this._removeItem.bind(this, 'workout'));
   }
 
   _newItem(type, e) {
@@ -210,6 +237,20 @@ class App {
     const bsCollapse = new bootstrap.Collapse(collapseItem, {
       toggle: true
     });
+  }
+
+  _removeItem(type, e) {
+    if (e.target.classList.contains('delete')) {
+      if (confirm('Are you sure?')) {
+        const id = e.target.closest('.card').getAttribute('data-id');
+        
+        type === 'meal' 
+          ? this._tracker.removeMeal(id)
+          : this._tracker.removeWorkout(id);
+        
+        e.target.closest('.card').remove();
+      }
+    }
   }
 }
 
