@@ -124,7 +124,7 @@ class App {
     mealForm.addEventListener('submit', this._newMeal.bind(this));
     
     const workoutForm = document.getElementById('workout-form');
-    workout.addEventListener('submit', this._newWorkout.bind(this));
+    workoutForm.addEventListener('submit', this._newWorkout.bind(this));
     
   }
 
@@ -152,8 +152,8 @@ class App {
   _newWorkout(e) {
     e.preventDefault();
 
-    const name = document.getElementById('meal-name');
-    const calories = document.getElementById('meal-calories');
+    const name = document.getElementById('workout-name');
+    const calories = document.getElementById('workout-calories');
 
     // Validate inputs
     if (name.value === '' || calories .value=== '') {
@@ -162,8 +162,8 @@ class App {
     }
 
     // Create new meal, add it to tracker and add it to the DOM
-    const meal = new Meal(name.value, +calories.value);
-    this._tracker.addMeal(meal);
+    const workout = new Workout(name.value, +calories.value);
+    this._tracker.addWorkout(workout);
 
     // clear forms
     name.value = '';
