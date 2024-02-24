@@ -121,18 +121,18 @@ class App {
     this._tracker = new CalorieTracker()
 
     const mealForm = document.getElementById('meal-form');
-    mealForm.addEventListener('submit', this._newMeal.bind(this));
+    mealForm.addEventListener('submit', this._newItem.bind(this, 'meal'));
     
     const workoutForm = document.getElementById('workout-form');
-    workoutForm.addEventListener('submit', this._newWorkout.bind(this));
+    workoutForm.addEventListener('submit', this._newItem.bind(this, 'workout'));
     
   }
 
-  _newMeal(e) {
+  _newItem(type, e) {
     e.preventDefault();
 
-    const name = document.getElementById('meal-name');
-    const calories = document.getElementById('meal-calories');
+    const name = document.getElementById(`${type}-name`);
+    const calories = document.getElementById(`${type}-calories`);
 
     // Validate inputs
     if (name.value === '' || calories .value=== '') {
@@ -140,34 +140,24 @@ class App {
       return;
     }
 
-    // Create new meal, add it to tracker and add it to the DOM
-    const meal = new Meal(name.value, +calories.value);
-    this._tracker.addMeal(meal);
-
-    // clear forms
-    name.value = '';
-    calories.value = '';
-  }
-
-  _newWorkout(e) {
-    e.preventDefault();
-
-    const name = document.getElementById('workout-name');
-    const calories = document.getElementById('workout-calories');
-
-    // Validate inputs
-    if (name.value === '' || calories .value=== '') {
-      alert('Please pill in all fields');
-      return;
+    // Create new meal or item, add it to tracker and add it to the DOM
+    if (type === 'meal') {
+      const meal = new Meal(name.value, +calories.value);
+      this._tracker.addMeal(meal);
+    } else {
+      const workout = new Workout(name.value, +calories.value);
+      this._tracker.addWorkout(workout);
     }
 
-    // Create new meal, add it to tracker and add it to the DOM
-    const workout = new Workout(name.value, +calories.value);
-    this._tracker.addWorkout(workout);
-
     // clear forms
     name.value = '';
     calories.value = '';
+
+    // close collapsable form when the user submits
+    const collapseItem = document.getElementById(`collapse-${type}`);
+    const bsCollapse = new bootstrap.Collapse(collapseItem, {
+      toggle: true
+    });
   }
 }
 
