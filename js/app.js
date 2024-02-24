@@ -51,20 +51,38 @@ class CalorieTracker {
 
   _displayCaloriesRemaining() {
     const caloriesRemainingEl = document.getElementById('calories-remaining');
-    const parentContainer = caloriesRemainingEl.parentElement.parentElement;
+    const caloriesRemainingContainer = caloriesRemainingEl.parentElement.parentElement;
+    const progressEl = document.getElementById('calorie-progress');
     const caloriesRemaining = this._calorieLimit - this._totalCalories;
 
     caloriesRemainingEl.textContent = caloriesRemaining;
 
-    if (caloriesRemaining <= 300) {
-      parentContainer.classList.replace('bg-light', 'bg-danger');
-      parentContainer.classList.add('text-white');
+    // Color the calories remaining tracker and pgrogress bar red if calorie limit is hit
+    if (caloriesRemaining <= 0) {
+      this._displayAlert(caloriesRemainingContainer, progressEl);
     } else {
-      parentContainer.classList.replace('bg-danger', 'bg-light');
-      parentContainer.classList.remove('text-white');
+      this._removeAlert(caloriesRemainingContainer, progressEl);
     }
+  }
 
+  _displayProgress() {
+    const progressEl = document.getElementById('calorie-progress');
+    const percentage = (this._totalCalories / this._calorieLimit) * 100;
 
+    const width = Math.min(percentage, 100);
+    progressEl.style.width = `${width}%`;
+  }
+
+  _displayAlert(caloriesRemainingContainer, progressEl) {
+    caloriesRemainingContainer.classList.replace('bg-light', 'bg-danger');
+    caloriesRemainingContainer.classList.add('text-white');
+    progressEl.classList.add('bg-danger');
+  }
+
+  _removeAlert(caloriesRemainingContainer, progressEl) {
+    caloriesRemainingContainer.classList.replace('bg-danger', 'bg-light');
+    caloriesRemainingContainer.classList.remove('text-white');
+    progressEl.classList.remove('bg-danger');
   }
 
   _render() {
@@ -72,6 +90,7 @@ class CalorieTracker {
     this._displayCaloriesBurned();
     this._displayCaloriesConsumed();
     this._displayCaloriesRemaining();
+    this._displayProgress();
   }
 
 }
@@ -98,10 +117,11 @@ const tracker = new CalorieTracker();
 const breakfast = new Meal('Breakfast', 1000);
 tracker.addMeal(breakfast);
 
-const lunch = new Meal('Lunch', 1699);
+const lunch = new Meal('Lunch', 2799);
 tracker.addMeal(lunch);
 
-// const basketball = new Workout('Basketball match', 700, 5);
-// tracker.addWorkout(basketball);
+
+const basketball = new Workout('Basketball match', 700, 5);
+tracker.addWorkout(basketball);
 
 console.log(tracker);
