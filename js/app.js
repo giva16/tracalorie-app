@@ -6,6 +6,7 @@ class CalorieTracker {
     this._totalCalories = Storage.getTotalCalories();
     this._meals = Storage.getMeals();
     this._workouts = [];
+    this._restoreMeals();
     this._displayCaloriesTotal();
     this._displayCaloriesLimit();
     this._displayCaloriesConsumed();
@@ -92,6 +93,12 @@ class CalorieTracker {
       </div>`;
 
     mealsEl.appendChild(mealEl);
+  }
+
+  _restoreMeals() {
+    for (const [key, meal] of Object.entries(this._meals)) {
+      this._displayNewMeal(meal);
+    }
   }
 
   _displayNewWorkout(workout) {
