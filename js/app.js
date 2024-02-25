@@ -4,7 +4,7 @@ class CalorieTracker {
   constructor() {
     this._calorieLimit = Storage.getCalorieLimit();
     this._totalCalories = Storage.getTotalCalories();
-    this._meals = [];
+    this._meals = Storage.getMeals();
     this._workouts = [];
     this._displayCaloriesTotal();
     this._displayCaloriesLimit();
@@ -15,10 +15,10 @@ class CalorieTracker {
 
   // Public methods/API
   addMeal(meal) {
-    this._meals.push(meal);
-    Storage.saveMeal(meal);
+    this._meals[meal.id] = meal;
     this._totalCalories += meal.calories;
     Storage.setTotalCalories(this._totalCalories);
+    Storage.saveMeal(meal);
     this._displayNewMeal(meal);
     this._render();
   }
@@ -32,13 +32,12 @@ class CalorieTracker {
   }
 
   removeMeal(id) {
-    const index = this._meals.findIndex((meal) => meal.id === id);
-
-    if (index != -1) {
-      const meal = this._meals[index];
+    const meal = this._meals[id];
+    if (meal != undefined) {
       this._totalCalories -= meal.calories;
       Storage.setTotalCalories(this._totalCalories);
-      this._meals.splice(index, 1);
+      Storage.removeMeal(meal);
+      delete this._meals[meal.id];
       this._render();
     }
   }
@@ -132,9 +131,11 @@ class CalorieTracker {
 
   _displayCaloriesConsumed() {
     const caloriesConsumedEl = document.getElementById('calories-consumed');
-    caloriesConsumedEl.textContent = this._meals.reduce((totalCal, meal) => {
-      return totalCal + meal.calories;
-    }, 0);
+    let totalCal = 0;
+    for (const [key, meal] of Object.entries(this._meals)) {
+      totalCal += meal.calories;
+    }
+    caloriesConsumedEl.textContent = totalCal;
   }
 
   _displayCaloriesBurned() {
@@ -240,29 +241,38 @@ class Storage {
     localStorage.setItem('totalCalories', totalCalories);
   }
 
-  // save the meal to storage every time it is added by the user
-  static saveMeal(meal) {
+  static getMeals() {
     let meals;
-    // initialize a meals array storage if theres none in sotrage
+    // initialize a meals array storage if theres none in storage
     if (localStorage.getItem('meals') === null) {
       meals = {};
+    } else {
+      meals = JSON.parse(localStorage.getItem('meals'));
     }
+    return meals;
+  }
+
+  // save the meal to storage every time it is added by the user
+  static saveMeal(meal) {
+    const meals = Storage.getMeals();
     meals[meal.id] = meal;
     localStorage.setItem('meals', JSON.stringify(meals));
   }
 
   // remove the meal from storage if its deleted by the user
-  static removeMeal(id) {
+  /* NOTE: I've opted to use objects due to its 
+   * hashing capabilities yielding O(1) search time complexity */
+  static removeMeal(meal) {
     let meals;
 
     // get meals from storage
     if (localStorage.getItem('meals') === null) {
       return;
     }
+    meals = JSON.parse(localStorage.getItem('meals'));
 
-    //delete meal
-    meals = localStorage.getItem('meals');
-    delete meals[id];
+    // delete the specified meal
+    delete meals[meal.id];
 
     //save back to storage
     localStorage.setItem('meals', JSON.stringify(meals));
