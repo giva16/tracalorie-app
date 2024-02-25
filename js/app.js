@@ -6,7 +6,7 @@ class CalorieTracker {
     this._totalCalories = Storage.getTotalCalories();
     this._meals = Storage.getMeals();
     this._workouts = Storage.getWorkouts();
-    this._restoreMeals();
+    this._restoreItems();
     this._displayCaloriesLimit();
     this._displayCaloriesTotal();
     this._displayCaloriesBurned();
@@ -26,7 +26,7 @@ class CalorieTracker {
   }
 
   addWorkout(workout) {
-    this._workouts[workout.id];
+    this._workouts[workout.id] = workout;
     this._totalCalories -= workout.calories;
     Storage.setTotalCalories(this._totalCalories);
     Storage.saveWorkout(workout);
@@ -99,9 +99,12 @@ class CalorieTracker {
     mealsEl.appendChild(mealEl);
   }
 
-  _restoreMeals() {
+  _restoreItems() {
     for (const [key, meal] of Object.entries(this._meals)) {
       this._displayNewMeal(meal);
+    }
+    for (const [key, workout] of Object.entries(this._workouts)) {
+      this._displayNewWorkout(workout);
     }
   }
 
