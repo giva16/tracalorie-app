@@ -6,7 +6,6 @@ class CalorieTracker {
     this._totalCalories = Storage.getTotalCalories();
     this._meals = Storage.getMeals();
     this._workouts = Storage.getWorkouts();
-    this._restoreItems();
     this._displayCaloriesLimit();
     this._displayCaloriesTotal();
     this._displayCaloriesBurned();
@@ -99,7 +98,7 @@ class CalorieTracker {
     mealsEl.appendChild(mealEl);
   }
 
-  _restoreItems() {
+  loadItems() {
     for (const [key, meal] of Object.entries(this._meals)) {
       this._displayNewMeal(meal);
     }
@@ -339,6 +338,12 @@ class App {
   constructor() {
     this._tracker = new CalorieTracker()
 
+    this._loadEventListeners();
+
+    this._tracker.loadItems();
+  }
+  
+  _loadEventListeners() {
     const mealForm = document.getElementById('meal-form');
     mealForm.addEventListener('submit', this._newItem.bind(this, 'meal'));
     
