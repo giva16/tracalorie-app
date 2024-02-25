@@ -2,7 +2,7 @@
 // This class is directly connected to the UI
 class CalorieTracker {
   constructor() {
-    this._calorieLimit = 3000;
+    this._calorieLimit = Storage.getCalorieLimit();
     this._totalCalories = 0;
     this._meals = [];
     this._workouts = [];
@@ -59,6 +59,7 @@ class CalorieTracker {
 
   setLimit(calorieLimit) {
     this._calorieLimit = calorieLimit;
+    Storage.setCalorieLimit(calorieLimit);
     this._displayCaloriesLimit();
     this._render();
   }
@@ -201,6 +202,23 @@ class Workout {
   }
 }
 
+// Storage class with static methods to presist all data
+class Storage {
+  static getCalorieLimit(defaultLimit = 3000) {
+    let calorieLimit;
+    if (localStorage.getItem('calorieLimit') === null) {
+      calorieLimit = defaultLimit;
+    } else {
+      calorieLimit = +localStorage.getItem('calorieLimit');
+    }
+    return calorieLimit;
+  }
+
+  static setCalorieLimit(calorieLimit) {
+    localStorage.setItem('calorieLimit', calorieLimit);
+  }
+}
+
 // Initializes CalorieTracker (including event listeners to connect CalorieTracker to the UI)
 // Manage the creation/deletion of meals, and workouts
 class App {
@@ -240,7 +258,7 @@ class App {
 
     // Validate inputs
     if (name.value === '' || calories .value=== '') {
-      alert('Please pill in all fields');
+      alert('Please fill in all fields');
       return;
     }
 
