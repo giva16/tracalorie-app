@@ -5,13 +5,14 @@ class CalorieTracker {
     this._calorieLimit = Storage.getCalorieLimit();
     this._totalCalories = Storage.getTotalCalories();
     this._meals = Storage.getMeals();
-    this._workouts = [];
+    this._workouts = Storage.getWorkouts();
     this._restoreMeals();
-    this._displayCaloriesTotal();
     this._displayCaloriesLimit();
-    this._displayCaloriesConsumed();
+    this._displayCaloriesTotal();
     this._displayCaloriesBurned();
+    this._displayCaloriesConsumed();
     this._displayCaloriesRemaining();
+    this._displayProgress();
   }
 
   // Public methods/API
@@ -25,15 +26,17 @@ class CalorieTracker {
   }
 
   addWorkout(workout) {
-    this._workouts.push(workout);
+    this._workouts[workout.id];
     this._totalCalories -= workout.calories;
     Storage.setTotalCalories(this._totalCalories);
+    Storage.saveWorkout(workout);
     this._displayNewWorkout(workout);
     this._render();
   }
 
   removeMeal(id) {
     const meal = this._meals[id];
+
     if (meal != undefined) {
       this._totalCalories -= meal.calories;
       Storage.setTotalCalories(this._totalCalories);
@@ -44,27 +47,28 @@ class CalorieTracker {
   }
 
   removeWorkout(id) {
-    const index = this._workouts.findIndex((workout) => workout.id === id);
+    const workout = this._workouts[id];
     
-    if (index != -1) {
-      const workout = this._workouts[index];
+    if (workout != undefined) {
       this._totalCalories += workout.calories;
       Storage.setTotalCalories(this._totalCalories);
-      this._workouts.splice(index, 1);
+      Storage.removeWorkout(workout);
+      delete this._workouts[workout.id];
       this._render();
     }
   }
 
   resetDay() {
-    this._meals = [];
-    this._workouts = [];
+    this._meals = {};
+    this._workouts = {};
     this._totalCalories = 0;
+    Storage.clearAll();
     this._render();
   }
 
   setLimit(calorieLimit) {
     this._calorieLimit = calorieLimit;
-    Storage.setCalorieLimit(calorieLimit);
+    Storage.setCalorieLimit(this._calorieLimit);
     this._displayCaloriesLimit();
     this._render();
   }
@@ -147,9 +151,11 @@ class CalorieTracker {
 
   _displayCaloriesBurned() {
     const caloriesBurnedEl = document.getElementById('calories-burned');
-    caloriesBurnedEl.textContent = this._workouts.reduce((totalCal, workout) => {
-      return totalCal + workout.calories;
-    }, 0);
+    let totalCal = 0;
+    for (const [key, workout] of Object.entries(this._workouts)) {
+      totalCal += workout.calories;
+    }
+    caloriesBurnedEl.textContent = totalCal;
   }
 
   _displayCaloriesRemaining() {
@@ -284,6 +290,44 @@ class Storage {
     //save back to storage
     localStorage.setItem('meals', JSON.stringify(meals));
   }
+
+  static getWorkouts() {
+    let workouts;
+
+    if (localStorage.getItem('workouts') === null) {
+      workouts = {};
+    } else {
+      workouts = JSON.parse(localStorage.getItem('workouts'));
+    }
+    return workouts;
+  }
+
+  // save the meal to storage every time it is added by the user
+  static saveWorkout(workout) {
+    const workouts = Storage.getWorkouts();
+    workouts[workout.id] = workout;
+    localStorage.setItem('workouts', JSON.stringify(workouts));
+  }
+
+  static removeWorkout(workout) {
+    let workouts;
+
+    if (localStorage.getItem('workouts') === null) {
+      return;
+    }
+    workouts = JSON.parse(localStorage.getItem('workouts'));
+
+    delete workouts[workout.id];
+
+    //save back to storage
+    localStorage.setItem('workouts', JSON.stringify(workouts));
+  }
+
+  static clearAll() {
+    localStorage.removeItem('meals');
+    localStorage.removeItem('workouts');
+    localStorage.removeItem('totalCalories');
+  }
 }
 
 // Initializes CalorieTracker (including event listeners to connect CalorieTracker to the UI)
@@ -387,7 +431,7 @@ class App {
     const limit = document.getElementById('limit');
     
     // Input validation
-    if (!checkNumerical.test(Math.round(+limit.value))) {
+    if (!checkNumerical.test(Math.round(+limit.value)) || limit.value === '') {
       alert("Please enter a valid number");
       return;
     }
