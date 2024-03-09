@@ -89,7 +89,6 @@ class App {
   }
 
   _filterItems(type, e) {
-    // f
     const text = e.target.value;
     const searchQuery = new RegExp(`^${text}`, 'i'); // Regex to filter elements
     const items = document.querySelectorAll(`#${type}-items .card`);
