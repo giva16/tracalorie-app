@@ -1,4 +1,6 @@
-# Tracalorie Application
+# Tracalorie Application : A calorie tracker App
+
+👉 [View a live demo](https://meek-praline-bb8380.netlify.app/)
 
 ## About The Project
 
